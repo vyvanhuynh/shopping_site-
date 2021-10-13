@@ -109,8 +109,9 @@ def add_to_cart(melon_id):
     if melon_id not in shopping_cart:
         shopping_cart[melon_id] = count + 1
     #print(shopping_cart) where is the output ?
-    # msg = session["cart"][melon_id]
-    # flash(msg)
+    
+    #msg = session["cart"][melon_id]
+    #flash(msg)
     flash('Melon successfully added to cart')
     # - redirect the user to the cart page
     return redirect("/cart")
