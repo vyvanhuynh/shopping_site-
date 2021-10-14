@@ -9,7 +9,7 @@ Authors: Joel Burton, Christian Fernandez, Meggie Mahnken, Katie Byers.
 from flask import Flask, render_template, redirect, flash, session
 import jinja2
 
-import melons
+import melons   
 
 app = Flask(__name__)
 
@@ -78,13 +78,19 @@ def show_shopping_cart():
     # been added to the session
     
     total_cost = 0
-    melons_types_dict = melons.read_melon_types_from_file("melons.txt")
+    grand_total = 0
     shopping_cart = session["cart"]
+    melons_obj_list = []
+
     for melon_id in shopping_cart:
-        melons_obj.append(melons.get_by_id(melon_id))
-        total_cost = melons_obj.price * shopping_cart[item]
-    
-    return render_template("cart.html",total_cost=total_cost, melons=melons_obj)
+        melon_obj = melons.get_by_id(melon_id)
+        total_cost = melon_obj.price * shopping_cart[melon_id]
+        grand_total = grand_total + total_cost
+        # add quantity and total cost to Melon object How ???? Can we do this ???? 
+        melon_obj.quantity =  shopping_cart[melon_id]    
+        melon_obj.total_cost = total_cost
+        melons_obj_list.append(melon_obj)
+    return render_template("cart.html",grand_total=grand_total, melons=melons_obj_list)
 
 
 @app.route("/add_to_cart/<melon_id>")
@@ -102,20 +108,25 @@ def add_to_cart(melon_id):
     # - check if a "cart" exists in the session, and create one (an empty
     #   dictionary keyed to the string "cart") if not
     shopping_cart = {}
-    count = 0
-    this_key = "cart"
-    if this_key not in session:
-        session["cart"] = {}
-    else:
-        session["cart"] = shopping_cart
-    
     # - check if the desired melon id is the cart, and if not, put it in
-    # - increment the count for that melon id by 1
+    # - increment the count for that melon id by 1{}
     # - flash a success message
-    if melon_id not in shopping_cart:
-        shopping_cart[melon_id] = count + 1
+    # shopping_cart[melon_id] = shopping_cart.get(melon_id, 0) + 1
     #print(shopping_cart) where is the output ?
     
+    # this_key = "cart"
+    # if this_key not in session:
+    #     session["cart"] = {}
+    # else:
+    #     session["cart"] = shopping_cart
+
+    this_key = "cart"
+    if this_key not in session:
+        session["cart"] = shopping_cart   
+    else:
+        shopping_cart = session["cart"] 
+
+    shopping_cart[melon_id] = shopping_cart.get(melon_id, 0) + 1
     #msg = session["cart"][melon_id]
     #flash(msg)
     flash('Melon successfully added to cart')
